@@ -44,7 +44,7 @@ sudo -u jira rclone --config /etc/rclone/rclone.conf ls jira_backup:/mnt/backup/
 sudo nano /opt/scripts/sync_jira_attachments.sh
 ```
 
-Содержимое:
+Содержимое для синхрона :
 ```
 #!/bin/bash
 
@@ -58,6 +58,27 @@ rclone sync "$SOURCE_DIR" "$REMOTE" \
     --checkers 8 \
     --delete \
     --stats 1m
+```
+
+Содержимое для копирования:
+```
+#!/bin/bash
+
+SOURCE_DIR="/var/atlassian/application-data/jira/data/attachments/"
+REMOTE="jira_backup:/mnt/backup/jira/attachments/"
+CONFIG="/etc/rclone/rclone.conf"
+
+rclone copy "$SOURCE_DIR" "$REMOTE" \
+    --config "$CONFIG" \
+    --transfers 32 \
+    --checkers 128 \
+    --fast-list \
+    --size-only \
+    --max-backlog 200000 \
+    --buffer-size 64M \
+    --stats 1m \
+    --log-file=/var/log/rclone-copy.log \
+    --log-level INFO
 ```
 
 Права:
